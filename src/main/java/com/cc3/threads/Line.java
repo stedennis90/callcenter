@@ -9,6 +9,7 @@ package com.cc3.threads;
 import com.cc3.model.Attendant;
 import com.cc3.model.CallCenter;
 import com.cc3.model.CallData;
+import java.util.Objects;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -66,7 +67,7 @@ public class Line extends Thread implements Comparable<Line>{
                     
                     System.out.printf("\nCC - %s: atendiendo!", attendant.getName());
                     System.out.printf("\nCC - %s: Hola, como está Sr(a) %s!", attendant.getName(), callData.getUsername());
-                    conversationStablished.signalAll();
+                    conversationStablished.signal();
                     
                     finishedCall.await();
                     callData = null;
@@ -92,15 +93,47 @@ public class Line extends Thread implements Comparable<Line>{
         return lineName;
     }
 
-    public String getAttendantName() {
-        return attendant.getName();
+    public Attendant getAttendant() {
+        return attendant;
     }
 
     @Override
     public int compareTo(Line other) {
-        return other.getLineName().compareTo(lineName);
+        return this.hashCode()-other.hashCode();
     }
 
+    @Override
+    public int hashCode() {
+        switch(this.attendant.getRol()){
+            case DIRECTOR: return 3;
+            case SUPERVISOR: return 2;
+            case OPERADOR: return 1;
+        }
+        return 0;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Line other = (Line) obj;
+        if (!Objects.equals(this.lineName, other.lineName)) {
+            return false;
+        }
+        if (!Objects.equals(this.attendant, other.attendant)) {
+            return false;
+        }
+        return true;
+    }
+
+    
     
     
 }

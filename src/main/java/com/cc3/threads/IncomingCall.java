@@ -52,7 +52,7 @@ public class IncomingCall extends Thread {
     }
     
     private void playWaitMusic(){
-        System.out.printf("\nU - %s: Please wait online... \u266A\u266B\u266C \u266A\u266B\u266C!", callData.getUsername());
+        System.out.printf("\nU - %s: Esperando asesor en linea ... \u266A\u266B\u266C \u266A\u266B\u266C!", callData.getUsername());
         try {
             Thread.sleep(1000);
         } catch (InterruptedException ignored) {
@@ -63,6 +63,7 @@ public class IncomingCall extends Thread {
     @Override
     public void run() {
         int retry = 0;
+        System.out.printf("\nU - %s: Inicia llamada!", callData.getUsername());
         
         while (!finished && retry < 3){
             finished = false;
@@ -75,20 +76,17 @@ public class IncomingCall extends Thread {
                     //if (line.lock.tryLock()){
                         try{
                             line.lock.lock();
-
-                            System.out.printf("\nU - %s: Inicia llamada!", callData.getUsername());
-                            //line.freeLine.await(1, TimeUnit.SECONDS);
-                            line.freeLine.signalAll();
-                            System.out.printf("\nU - %s: esperando asesor!", callData.getUsername());
-                            line.conversationStablished.await();
                             
+                            line.freeLine.signal();
+                            System.out.printf("\nU - %s: esperando asesor!", callData.getUsername());
+                            
+                            line.conversationStablished.await();
                             playConversation();
 
-                            line.finishedCall.signalAll();
+                            line.finishedCall.signal();
                             System.out.printf("\nU - %s: terminó llamada!", callData.getUsername());
 
                         } finally {
-                            System.out.printf("\nU...Finally incoming call");
                             line.lock.unlock();
                         }
                     /*} else {
@@ -111,9 +109,9 @@ public class IncomingCall extends Thread {
     }
 
     private void playConversation() throws InterruptedException {
-        System.out.printf("\n Llamada entrante / %d: Hola soy el usuario %s, hablo con el asesor '%s'", callData.getFrom(), callData.getUsername(), line.getAttendantName());
+        System.out.printf("\n Llamada entrante / %d: Hola soy el usuario %s, hablo con el asesor '%s'", callData.getFrom(), callData.getUsername(), line.getAttendant().getName());
         Thread.sleep(callData.getDuration());
-        System.out.printf("\n Llamada entrante / %d: Adios, muchas gracias por su atención", callData.getFrom());
+        System.out.printf("\n Llamada entrante / %d: Adios, muchas gracias por su atención [%d segundos]", callData.getFrom(), callData.getDuration()/1000);
         finished = true;
     }
 

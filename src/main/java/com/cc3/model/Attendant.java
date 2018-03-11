@@ -11,12 +11,12 @@ package com.cc3.model;
  */
 public class Attendant {
     
-    enum ROL{OPERADOR, SUPERVISOR, DIRECTOR }
+    
     
     private String name;
-    private ROL rol;
+    private Rol rol;
 
-    public Attendant(String nombre, ROL rol) {
+    public Attendant(String nombre, Rol rol) {
         this.name = nombre;
         this.rol = rol;
     }
@@ -30,11 +30,11 @@ public class Attendant {
     }
 
 
-    public ROL getRol() {
+    public Rol getRol() {
         return rol;
     }
 
-    public void setRol(ROL rol) {
+    public void setRol(Rol rol) {
         this.rol = rol;
     }
     
