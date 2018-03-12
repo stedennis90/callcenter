@@ -7,7 +7,7 @@ package com.cc3.model;
 
 /**
  *
- * @author Dmartinezb
+ * @author Dennis
  */
 public class Attendant {
     

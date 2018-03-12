@@ -6,7 +6,7 @@
 package com.cc3.model;
 
 /**
- *
+ * Categorización de roles de los asesores.
  * @author dennis
  */
 public enum Rol{

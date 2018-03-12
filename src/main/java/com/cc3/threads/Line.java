@@ -7,7 +7,7 @@ package com.cc3.threads;
 
 
 import com.cc3.model.Attendant;
-import com.cc3.model.CallCenter;
+import com.cc3.controller.CallCenter;
 import com.cc3.model.CallData;
 import java.util.Objects;
 import java.util.concurrent.locks.Condition;
@@ -15,21 +15,26 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- *
- * @author Dmartinezb
+ * Clase que representa un hilo de una linea asignada a un asesor.
+ * Esta clase realiza el ciclo de vida de la llamada desde el lado del asesor,
+ *      Espera una nueva llamada.
+ *      Notifica al usuario su disponibilidad para atender.
+ *      Espera que el usuario finalice la llamada.
+ * El ciclo de vida de la linea es infinito, por lo tanto el asesor siempre 
+ * quedará despierto esperando la siguiente llamada.
+ * @author Dennis
  */
-public class Line extends Thread implements Comparable<Line>{
-
+public class Line extends Thread implements Comparable<Line> {
     
     /**
-     * Lock para gesionar el call center.
+     * Lock para gesionar la linea.
      */
     public final Lock lock = new ReentrantLock();
     
     /**
-     * Identifica si hay una linea disponible para atender llamada.
+     * Identifica si hay una nueva llamada para atenderla.
      */
-    public final Condition freeLine = lock.newCondition();
+    public final Condition newCall = lock.newCondition();
     
     /**
      * Identifica si la llamada ya terminó.
@@ -41,16 +46,28 @@ public class Line extends Thread implements Comparable<Line>{
      */
     public final Condition conversationStablished = lock.newCondition();
     
-
-    
+    /**
+     * Nombre de la linea.
+     */
     private final String lineName;
+    
+    /**
+     * Datos del asesor encargado.
+     */
     private final Attendant attendant;
     
+    /**
+     * Datos de la llamada
+     */
     private CallData callData;
-    private final CallCenter callCenter;
     
-    public Line(CallCenter callCenter, String name, Attendant attendant) {
-        this.callCenter = callCenter;
+    
+    /**
+     * Constructor.
+     * @param name Nombre de la linea.
+     * @param attendant Datos del asesor.
+     */
+    public Line(String name, Attendant attendant) {
         this.lineName = name;
         this.attendant = attendant;
         this.start();
@@ -63,7 +80,7 @@ public class Line extends Thread implements Comparable<Line>{
                 try{
 
                     System.out.printf("\nCC - %s: disponible!", attendant.getName());
-                    freeLine.await();
+                    newCall.await();
                     
                     System.out.printf("\nCC - %s: atendiendo!", attendant.getName());
                     System.out.printf("\nCC - %s: Hola, como está Sr(a) %s!", attendant.getName(), callData.getUsername());
@@ -132,8 +149,5 @@ public class Line extends Thread implements Comparable<Line>{
         }
         return true;
     }
-
-    
-    
     
 }
